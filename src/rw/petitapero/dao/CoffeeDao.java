@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CoffeeDao {
-    private String jdbcUrl = "jdbc:mysql://localhost:3306/mydatabase?useSSL=false";
+    private String jdbcUrl = "jdbc:mysql://localhost:3306/schoolstudent?allowPublicKeyRetrieval=true&useSSL=false";
     private String username = "carlos";
     private String dbPassword = "bouBoune#123";
 
