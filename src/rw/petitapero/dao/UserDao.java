@@ -34,7 +34,29 @@ public class UserDao {
         }
         return null;
     }
-
+    public int loginUser(String email, String password) {
+        try {
+            Connection con = DriverManager.getConnection(jdbcUrl, username, dbPassword);
+            String sql = "SELECT * FROM users WHERE email=? AND password=?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, email);
+            pst.setString(2, password);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                // Login successful
+                con.close();
+                return 1;
+            } else {
+                // Invalid email or password
+                con.close();
+                return 0;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // Error occurred while logging in
+            return -1;
+        }
+    }
     public Integer updateUser(User user) {
         try {
             Connection con = DriverManager.getConnection(jdbcUrl, username, dbPassword);

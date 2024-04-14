@@ -5,6 +5,7 @@ import rw.petitapero.dao.UserDao;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Button;
@@ -26,8 +27,8 @@ public class SignUp extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField userEmail;
-	private JTextField userPassword;
-	private JTextField userConfirmPassword;
+	private JPasswordField userPassword;
+	private JPasswordField userConfirmPassword;
 	private JTextField userName;
 	int xx,xy;
 
@@ -113,6 +114,12 @@ public class SignUp extends JFrame {
                 if (success != null) {
                     if (success.intValue() > 0) {
                         JOptionPane.showMessageDialog(SignUp.this, "Data Saved!");
+                        Login LoginFrame = new Login();
+                        LoginFrame.setUndecorated(true);	
+                        LoginFrame.setVisible(true);
+                        
+                        // Close the current sign Up frame
+                        dispose();
                     } else {
                         JOptionPane.showMessageDialog(SignUp.this, "Data Not Saved!");
                     }
@@ -134,12 +141,12 @@ public class SignUp extends JFrame {
 		contentPane.add(userEmail);
 		userEmail.setColumns(10);
 		
-		userPassword = new JTextField();
+		userPassword = new JPasswordField();
 		userPassword.setBounds(495, 207, 272, 30);
 		userPassword.setColumns(10);
 		contentPane.add(userPassword);
 		
-		userConfirmPassword = new JTextField();
+		userConfirmPassword =new JPasswordField();
 		userConfirmPassword.setBounds(495, 270, 272, 30);
 		userConfirmPassword.setColumns(10);
 		contentPane.add(userConfirmPassword);
