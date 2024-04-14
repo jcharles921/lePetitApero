@@ -7,9 +7,9 @@ USE coffee_ordering_system;
 -- Create the coffees table
 CREATE TABLE IF NOT EXISTS coffees (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT NOT NULL,
-    category VAR    CHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
     price DECIMAL(10, 2) NOT NULL
 );
 
@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     coffee_id INT,
+    coffee_name VARCHAR(255) NOT NULL,
     user_id INT,
     quantity INT NOT NULL,
     status ENUM('completed', 'failed', 'pending') NOT NULL,
