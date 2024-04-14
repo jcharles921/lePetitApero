@@ -90,14 +90,19 @@ public class SignUp extends JFrame {
                 // Perform validation checks on text fields
                 String name = userName.getText();
                 String email = userEmail.getText();
-                String password = userPassword.getText();
-                String confirmPassword = userConfirmPassword.getText();
+                @SuppressWarnings("deprecation")
+				String password = userPassword.getText();
+                @SuppressWarnings("deprecation")
+				String confirmPassword = userConfirmPassword.getText();
                 // Check if any field is empty
                 if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 	JOptionPane.showMessageDialog(SignUp.this, "Missing Data in Fields");
                     return;
                 }
-
+                if (!isValidEmail(email)) {
+                    JOptionPane.showMessageDialog(SignUp.this, "Invalid email format!", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 // Check if passwords match
                 if (!password.equals(confirmPassword)) {
                 	JOptionPane.showMessageDialog(SignUp.this, "Passowrd doesn't match !!!");
@@ -176,7 +181,8 @@ public class SignUp extends JFrame {
 		lblConfirm.setFont(new Font("Cantarell", Font.BOLD, 12));
 		contentPane.add(lblConfirm);
 		
-		JLabel lbl_close = new JLabel("X");
+		JLabel lbl_close = new JLabel("");
+		lbl_close.setIcon(new ImageIcon(SignUp.class.getResource("/rw/petitapero/images/Exit.png")));
 		lbl_close.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		lbl_close.addMouseListener(new MouseAdapter() {
 			@Override
@@ -191,4 +197,9 @@ public class SignUp extends JFrame {
 		contentPane.add(lbl_close);
 		
 	}
+    private boolean isValidEmail(String email) {
+        // Use a simple regex pattern to validate email format
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email.matches(emailRegex);
+    }
 }

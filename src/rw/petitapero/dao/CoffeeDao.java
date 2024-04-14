@@ -1,15 +1,16 @@
 package rw.petitapero.dao;
-import rw.petitapero.model.Coffee;
+import rw.petitapero.model.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CoffeeDao {
-    private String jdbcUrl = "jdbc:mysql://localhost:3306/schoolstudent?allowPublicKeyRetrieval=true&useSSL=false";
+    private String jdbcUrl = "jdbc:mysql://localhost:3306/lepetitapero?allowPublicKeyRetrieval=true&useSSL=false";
     private String username = "carlos";
     private String dbPassword = "bouBoune#123";
 
@@ -32,45 +33,85 @@ public class CoffeeDao {
     }
 
     public Integer updateCoffee(Coffee coffee) {
+    	 try {
+    	        Connection con = DriverManager.getConnection(jdbcUrl, username, dbPassword);
+    	        String sql = "UPDATE coffees SET name=?, description=?, category=?, price=? WHERE name=?";
+    	        PreparedStatement pst = con.prepareStatement(sql);
+    	        pst.setString(1, coffee.getName());
+    	        pst.setString(2, coffee.getDescription());
+    	        pst.setString(3, coffee.getCategory());
+    	        pst.setDouble(4, coffee.getPrice());
+    	        pst.setString(5, coffee.getName());
+    	        int rowAffected = pst.executeUpdate();
+    	        System.out.println("Want to update " + coffee.getName()+ coffee.getDescription());
+    	        con.close();
+    	        return rowAffected;
+    	    } catch (SQLException ex) {
+    	        System.err.println("SQL Exception occurred:");
+    	        ex.printStackTrace();
+    	        return null;
+    	    } catch (Exception ex) {	
+    	        System.err.println("Exception occurred:");
+    	        ex.printStackTrace();
+    	        return null;
+    	    }
+    }
+
+    public Integer deleteCoffee(String name) {
+        Connection con = null; // Declare connection outside try block
         try {
-            Connection con = DriverManager.getConnection(jdbcUrl, username, dbPassword);
-            String sql = "UPDATE coffees SET name=?, description=?, category=?, price=? WHERE id=?";
-            PreparedStatement pst = con.prepareStatement(sql);
-            pst.setString(1, coffee.getName());
-            pst.setString(2, coffee.getDescription());
-            pst.setString(3, coffee.getCategory());
-            pst.setDouble(4, coffee.getPrice());
-            pst.setInt(5, coffee.getId());
-            int rowAffected = pst.executeUpdate();
-            con.close();
-            return rowAffected;
-        } catch (Exception ex) {
+            con = DriverManager.getConnection(jdbcUrl, username, dbPassword);
+            con.setAutoCommit(false); // Start transaction
+
+            // First, delete associated orders
+            String deleteOrdersSql = "DELETE FROM orders WHERE coffee_id IN (SELECT id FROM coffees WHERE name=?)";
+            PreparedStatement deleteOrdersPst = con.prepareStatement(deleteOrdersSql);
+            deleteOrdersPst.setString(1, name);
+            @SuppressWarnings("unused")
+			int ordersDeleted = deleteOrdersPst.executeUpdate();
+
+            // Then, delete the coffee
+            String deleteCoffeeSql = "DELETE FROM coffees WHERE name=?";
+            PreparedStatement deleteCoffeePst = con.prepareStatement(deleteCoffeeSql);
+            deleteCoffeePst.setString(1, name);
+            int coffeeDeleted = deleteCoffeePst.executeUpdate();
+
+            // Commit transaction
+            con.commit();
+            con.setAutoCommit(true);
+
+            return coffeeDeleted;
+        } catch (SQLException ex) {
+            // Rollback transaction in case of error
+            try {
+                if (con != null) {
+                    con.rollback();
+                    con.setAutoCommit(true);
+                }
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
             ex.printStackTrace();
+        } finally {
+            // Close connection in finally block to ensure it gets closed even if an exception occurs
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException closeEx) {
+                    closeEx.printStackTrace();
+                }
+            }
         }
         return null;
     }
 
-    public Integer deleteCoffee(int coffeeId) {
-        try {
-            Connection con = DriverManager.getConnection(jdbcUrl, username, dbPassword);
-            String sql = "DELETE FROM coffees WHERE id=?";
-            PreparedStatement pst = con.prepareStatement(sql);
-            pst.setInt(1, coffeeId);
-            int rowAffected = pst.executeUpdate();
-            con.close();
-            return rowAffected;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
 
-    public Coffee findCoffeeById(int coffeeId) {
+    public Coffee findCoffeeByName(String name) {
         try {
             Connection con = DriverManager.getConnection(jdbcUrl, username, dbPassword);
-            String sql = "SELECT * FROM coffees WHERE id=?";
+            String sql = "SELECT * FROM coffees WHERE name=?";
             PreparedStatement pst = con.prepareStatement(sql);
-            pst.setInt(1, coffeeId);
+            pst.setString(1, name);
             ResultSet rs = pst.executeQuery();
             Coffee coffee = null;
             if (rs.next()) {

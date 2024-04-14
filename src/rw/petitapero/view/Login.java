@@ -124,7 +124,8 @@ public class Login extends JFrame {
 		contentPane.add(lblEmail);
 		lblEmail.setFont(new Font("Cantarell", Font.BOLD, 12));
 		
-		JLabel lbl_close = new JLabel("X");
+		JLabel lbl_close = new JLabel("");
+		lbl_close.setIcon(new ImageIcon(Login.class.getResource("/rw/petitapero/images/Exit.png")));
 		lbl_close.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		lbl_close.addMouseListener(new MouseAdapter() {
 			@Override
